@@ -152,7 +152,7 @@ Indexes are validated using:
 EXPLAIN ANALYZE
 ```
 
-Execution plans and optimization notes are documented in this README.
+Execution plans and optimization notes will be documented in this README.
 
 ---
 
@@ -174,10 +174,6 @@ This approach balances simplicity with performance under heavy read load.
 * Decouple writes from cache invalidation
 * Enable eventual consistency
 * Prepare the system for future extensions
-
-### Local Development
-
-* Events are mocked using in-memory publishers.
 
 ### Production (Planned)
 
