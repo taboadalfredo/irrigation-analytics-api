@@ -15,6 +15,8 @@ The service is designed to be **production-oriented**, focusing on:
 
 ## High-Level Architecture
 
+![components](images/componentes.png)
+
 ```
 Client
   │ HTTPS
