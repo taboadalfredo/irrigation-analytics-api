@@ -374,6 +374,15 @@ Given the analytics-heavy nature of this service, **EC2/ECS is a better fit**.
 These decisions are documented to keep the scope focused and the codebase clean.
 
 ---
+## Run locally
+
+docker-compose up --build
+
+## Example
+
+curl -k https://localhost:8443/v1/farms/1/irrigation/analytics
+
+---
 
 ## Summary
 
