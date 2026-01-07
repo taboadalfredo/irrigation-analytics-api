@@ -4,12 +4,15 @@
 
 This repository contains the **Irrigation Analytics API**, a backend service written in Go that provides analytics and monitoring capabilities for irrigation systems in an agricultural platform.
 
-The service is designed to be **production-oriented**, focusing on:
+The service exposes a REST API that:
+- aggregates irrigation data over time
+- computes efficiency metrics
+- supports year-over-year comparisons
+- is optimized for large datasets
+- follows a clean, maintainable architecture
+- is fully dockerized with HTTPS via reverse proxy
 
-* Efficient SQL queries over large datasets
-* Clear separation of concerns (API, data access, infrastructure)
-* Observability via OpenTelemetry
-* Scalability through read replicas, caching, and event-driven invalidation
+The implementation focuses on **correctness, performance, and real-world design trade-offs**, rather than over-engineering.
 
 ---
 
@@ -43,8 +46,8 @@ Worker Service (separate repo)
 OpenTelemetry Collector
   └─ Logs / Metrics / Traces export
 ```
-
-Key characteristics:
+---
+## Key characteristics:
 
 * **Write and Read databases are separated** to scale analytics workloads.
 * **Eventual consistency** is accepted.
@@ -55,26 +58,56 @@ Key characteristics:
 
 ## Core Feature: Irrigation Analytics
 
-### Endpoint
+---
+
+## API Endpoint
+
+### Get Irrigation Analytics
 
 ```
 GET /v1/farms/{farm_id}/irrigation/analytics
 ```
 
-### Capabilities
+#### Query Parameters
 
-* Time-series analytics (daily / weekly ISO / monthly)
-* Aggregated metrics for dashboards
-* Year-over-year comparisons (1 and 2 years back)
-* Sector-level breakdowns
-* Efficient handling of large datasets
+| Name        | Type     | Description |
+|-------------|----------|-------------|
+| start_date  | ISO 8601 | Start of period (optional) |
+| end_date    | ISO 8601 | End of period (optional) |
+| sector_id   | uint     | Filter by sector (optional) |
+| aggregation | string   | daily \| weekly \| monthly (default: daily) |
 
-### Default Behavior
+#### Defaults
 
-* Timezone: **UTC**
-* Default date range: **last 7 days**
-* Missing farms: returns **empty metrics**, not errors
+- If no dates are provided: **last 7 days**
+- Timezone: **UTC**
+- If no data exists: metrics are returned empty (no error)
 
+---
+
+## Aggregations
+
+The service supports three aggregation levels:
+
+- **Daily**  
+  `date_trunc('day', start_time)`
+
+- **Weekly (ISO-8601)**  
+  `date_trunc('week', start_time)`
+
+- **Monthly**  
+  `date_trunc('month', start_time)`
+
+Aggregation logic is centralized and validated to avoid SQL injection and invalid input.
+
+---
+
+## Year-over-Year (YoY) Comparisons
+
+For the requested time range, the service computes metrics for:
+
+- same period last year (`-1`)
+- same period two years ago (`-2`)
 ---
 
 ## Data Model
